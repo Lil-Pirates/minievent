@@ -22,17 +22,33 @@
   .nav-pill { padding: 7px 18px; border-radius: 30px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; text-decoration: none; display: inline-block; margin-left: 8px; }
   .nav-pill:hover, .nav-pill.active { background: var(--yellow); color: var(--dark); border-color: var(--yellow); }
 
-  #hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 100px 24px 60px; position: relative; overflow: hidden; text-align: center; }
+  #hero { min-height: 52vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 90px 24px 40px; position: relative; overflow: hidden; text-align: center; }
   .hero-bg { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 80% 60% at 50% 0%, #ff5c5c18 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 80% 80%, #ffd84d14 0%, transparent 60%); }
-  .hero-tag { display: inline-block; padding: 5px 16px; border-radius: 20px; border: 1.5px solid var(--coral); color: var(--coral); font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; animation: fadeUp .6s ease both; }
-  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(72px, 14vw, 160px); line-height: .92; animation: fadeUp .7s .1s ease both; }
+  .hero-tag { display: inline-block; padding: 5px 16px; border-radius: 20px; border: 1.5px solid var(--coral); color: var(--coral); font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 18px; animation: fadeUp .6s ease both; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 9vw, 96px); line-height: .92; animation: fadeUp .7s .1s ease both; }
   .hero-title .line1 { color: var(--text); display: block; }
   .hero-title .line2 { color: var(--yellow); display: block; }
-  .hero-subtitle { margin-top: 24px; font-size: 17px; color: var(--muted); max-width: 380px; line-height: 1.6; animation: fadeUp .7s .2s ease both; }
-  .hero-cta { margin-top: 36px; padding: 16px 40px; border-radius: 50px; background: var(--coral); border: none; color: #fff; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900; cursor: pointer; transition: transform .2s, box-shadow .2s; animation: fadeUp .7s .3s ease both; box-shadow: 0 8px 30px #ff5c5c44; }
+  .hero-subtitle { margin-top: 16px; font-size: clamp(13px, 2vw, 16px); color: var(--muted); max-width: 340px; line-height: 1.6; animation: fadeUp .7s .2s ease both; }
+  .hero-cta { margin-top: 24px; padding: 13px 32px; border-radius: 50px; background: var(--coral); border: none; color: #fff; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900; cursor: pointer; transition: transform .2s, box-shadow .2s; animation: fadeUp .7s .3s ease both; box-shadow: 0 8px 30px #ff5c5c44; }
   .hero-cta:hover { transform: translateY(-3px); box-shadow: 0 14px 40px #ff5c5c55; }
   .hero-floats { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
   .float { position: absolute; opacity: .13; animation: floatAnim linear infinite; }
+  @media (max-width: 500px) {
+    #site-header { padding: 14px 16px; }
+    .logo { font-size: 22px; }
+    .nav-pill { padding: 5px 12px; font-size: 11px; }
+    #hero { padding: 76px 16px 32px; min-height: 44vh; }
+    .app-shell { border-radius: 18px; margin: 0 12px; }
+    .stat-item { min-width: 100px; padding: 16px 12px; }
+    .stat-num { font-size: 30px; }
+    #app { padding: 60px 0 80px; }
+    .section-header { padding: 0 16px 28px; }
+  }
+  @media (max-width: 360px) {
+    .hero-title { font-size: 38px; }
+    .stat-item { min-width: 80px; padding: 12px 8px; }
+    .stat-num { font-size: 24px; }
+  }
 
   .stats-strip { display: flex; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow-x: auto; }
   .stat-item { flex: 1; min-width: 130px; padding: 24px 20px; text-align: center; border-right: 1px solid var(--border); }
@@ -163,9 +179,9 @@
 <section id="hero">
   <div class="hero-bg"></div>
   <div class="hero-floats" id="heroFloats"></div>
-  <div class="hero-tag">🎪 Для детских аниматоров</div>
+  <div class="hero-tag">✨ Специально для Вики</div>
   <h1 class="hero-title"><span class="line1">MINI</span><span class="line2">EVENT</span></h1>
-  <p class="hero-subtitle">Все твои мероприятия в одном месте. Быстро, удобно, всегда под рукой.</p>
+  <p class="hero-subtitle">Создано с любовью для твоего удобства</p>
   <button class="hero-cta" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">Открыть календарь →</button>
 </section>
 
@@ -198,7 +214,7 @@
 
 <footer>
   <a class="logo" href="#hero">mini<span style="color:var(--coral)">event</span></a>
-  <p style="margin-top:8px">Твой личный планировщик мероприятий ✨</p>
+  <p style="margin-top:8px">Ты со всем справишься, я верю! 💛</p>
 </footer>
 
 <script type="module">
@@ -455,7 +471,11 @@ window._detail = id => { detailId=id; view="detail"; render(); };
 window._edit = id => { const ev=events.find(e=>e.id===id); if(!ev) return; formData={...ev}; editId=id; view="add"; render(); };
 window._del = async id => { await removeEvent(id); view="list"; };
 window._filter = s => { filterStatus=s; render(); };
-window._theme = t => { formData.theme=t; render(); };
+window._theme = t => {
+  const get = id => document.getElementById(id)?.value||"";
+  formData = { ...formData, title:get("f_title"), date:get("f_date"), time:get("f_time"), location:get("f_location"), ageGroup:get("f_age"), status:get("f_status"), payment:get("f_payment"), notes:get("f_notes"), theme:t };
+  render();
+};
 window._nd = n => { notifDays=n; render(); };
 window._cancel = () => { formData=emptyForm(); editId=null; view="calendar"; render(); };
 window._notif = () => {
@@ -466,10 +486,17 @@ window._save = async () => {
   const get = id => document.getElementById(id)?.value||"";
   formData = { ...formData, title:get("f_title"), date:get("f_date"), time:get("f_time"), location:get("f_location"), ageGroup:get("f_age"), status:get("f_status"), payment:get("f_payment"), notes:get("f_notes") };
   if (!formData.title||!formData.date) { toast("⚠️ Укажи название и дату!"); return; }
-  const {id, ...data} = formData;
-  if (editId) await updateEvent(editId, data);
-  else await addEvent(data);
-  formData=emptyForm(); editId=null; view="calendar";
+  // Disable save button to prevent double-tap
+  const btn = document.querySelector(".save-btn");
+  if (btn) { btn.disabled=true; btn.textContent="⏳ Сохраняю..."; }
+  try {
+    const {id, ...data} = formData;
+    if (editId) await updateEvent(editId, data);
+    else await addEvent(data);
+    formData=emptyForm(); editId=null; view="calendar"; render();
+  } catch(e) {
+    if (btn) { btn.disabled=false; btn.textContent = editId?"💾 Сохранить":"🎉 Добавить"; }
+  }
 };
 
 // Hero floats
