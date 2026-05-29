@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>minievent</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --coral: #ff5c5c;
+    --yellow: #ffd84d;
+    --mint: #3dd9a4;
+    --dark: #111418;
+    --card: #1a1f26;
+    --border: #2a313c;
+    --text: #e8edf3;
+    --muted: #7a8694;
+    --confirmed: #3dd9a4;
+    --pending: #ffd84d;
+    --completed: #a78bfa;
+    --cancelled: #ff5c5c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  #site-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 32px;
+    background: rgba(17,20,24,0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--yellow);
+    text-decoration: none;
+  }
+  .logo span { color: var(--coral); }
+  .header-nav { display: flex; gap: 8px; }
+  .nav-pill {
+    padding: 7px 18px; border-radius: 30px; border: 1.5px solid var(--border);
+    background: transparent; color: var(--muted); font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s;
+    text-decoration: none; display: inline-block;
+  }
+  .nav-pill:hover, .nav-pill.active {
+    background: var(--yellow); color: var(--dark); border-color: var(--yellow);
+  }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 100px 24px 60px;
+    position: relative; overflow: hidden; text-align: center;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, #ff5c5c18 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 80% 80%, #ffd84d14 0%, transparent 60%),
+                radial-gradient(ellipse 40% 50% at 10% 60%, #3dd9a410 0%, transparent 60%);
+  }
+  .hero-tag {
+    display: inline-block; padding: 5px 16px; border-radius: 20px;
+    border: 1.5px solid var(--coral); color: var(--coral);
+    font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 24px; animation: fadeUp .6s ease both;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 14vw, 160px);
+    line-height: .92;
+    letter-spacing: 2px;
+    animation: fadeUp .7s .1s ease both;
+  }
+  .hero-title .line1 { color: var(--text); display: block; }
+  .hero-title .line2 { color: var(--yellow); display: block; }
+  .hero-subtitle {
+    margin-top: 24px; font-size: 17px; color: var(--muted); max-width: 380px;
+    line-height: 1.6; animation: fadeUp .7s .2s ease both;
+  }
+  .hero-cta {
+    margin-top: 36px;
+    padding: 16px 40px; border-radius: 50px;
+    background: var(--coral); border: none; color: #fff;
+    font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900;
+    cursor: pointer; letter-spacing: .5px;
+    transition: transform .2s, box-shadow .2s;
+    animation: fadeUp .7s .3s ease both;
+    box-shadow: 0 8px 30px #ff5c5c44;
+  }
+  .hero-cta:hover { transform: translateY(-3px); box-shadow: 0 14px 40px #ff5c5c55; }
+
+  .hero-floats {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  }
+  .float {
+    position: absolute; font-size: 36px; opacity: .13;
+    animation: floatAnim linear infinite;
+  }
+
+  /* ── STATS STRIP ── */
+  .stats-strip {
+    display: flex; gap: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .stat-item {
+    flex: 1; min-width: 130px; padding: 24px 20px; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 42px;
+    color: var(--yellow); line-height: 1;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 700; letter-spacing: .5px; }
+
+  /* ── APP SECTION ── */
+  #app {
+    padding: 80px 0 100px;
+  }
+  .section-header {
+    text-align: center; padding: 0 24px 40px;
+  }
+  .section-tag {
+    display: inline-block; padding: 4px 14px; border-radius: 20px;
+    border: 1.5px solid var(--mint); color: var(--mint);
+    font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 6vw, 64px); letter-spacing: 2px;
+    color: var(--text);
+  }
+
+  /* ── CALENDAR APP ── */
+  .app-shell {
+    max-width: 480px; margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px #00000066;
+    position: relative;
+  }
+  .app-topbar {
+    background: linear-gradient(135deg, var(--coral), #c44dff, #7b2fff);
+    padding: 20px 22px 16px;
+  }
+  .app-topbar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px; letter-spacing: 3px; color: #fff;
+  }
+  .app-topbar-sub { font-size: 12px; color: rgba(255,255,255,.75); margin-top: 2px; }
+
+  .stats-row {
+    display: flex; gap: 10px; padding: 14px 16px 0;
+  }
+  .mini-stat {
+    flex: 1; background: #22283200; border: 1px solid var(--border);
+    border-radius: 14px; padding: 10px 12px;
+  }
+  .mini-stat-num { font-size: 20px; font-weight: 900; color: var(--yellow); }
+  .mini-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* Month nav */
+  .month-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 16px 8px;
+  }
+  .month-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--text); }
+  .arrow-btn {
+    width: 34px; height: 34px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--dark);
+    color: var(--yellow); font-size: 16px; font-weight: 900; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .arrow-btn:hover { background: var(--border); }
+
+  /* Calendar grid */
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 3px; padding: 0 14px;
+  }
+  .day-head { text-align: center; font-size: 10px; font-weight: 800; color: var(--muted); padding: 4px 0; }
+  .day-cell {
+    aspect-ratio: 1; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: background .12s; position: relative; color: var(--text);
+    border: 1px solid transparent;
+  }
+  .day-cell:hover:not(.empty) { background: var(--border); }
+  .day-cell.today {
+    background: linear-gradient(135deg, var(--coral), #c44dff);
+    color: #fff; border-color: transparent;
+  }
+  .day-cell.has-ev { background: #ffffff0d; border-color: var(--border); }
+  .day-cell.empty { cursor: default; color: #333; }
+  .dot-row { display: flex; gap: 2px; margin-top: 2px; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; }
+
+  /* Upcoming */
+  .upcoming-section { padding: 16px 16px 0; }
+  .upcoming-title {
+    font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--mint); margin-bottom: 10px;
+  }
+  .event-card {
+    background: var(--dark); border-radius: 16px; padding: 12px 14px;
+    margin-bottom: 8px; border-left: 3px solid var(--confirmed);
+    cursor: pointer; transition: transform .12s;
+    border: 1px solid var(--border); border-left-width: 3px;
+  }
+  .event-card:hover { transform: translateX(3px); }
+  .ec-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .ec-title { font-size: 14px; font-weight: 800; }
+  .ec-meta { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+  .ec-right { text-align: right; flex-shrink: 0; }
+  .ec-theme { font-size: 22px; }
+  .status-badge {
+    display: inline-block; padding: 2px 9px; border-radius: 20px;
+    font-size: 10px; font-weight: 800; margin-top: 4px;
+  }
+  .pay-badge { font-size: 13px; font-weight: 900; color: var(--mint); margin-top: 4px; display: block; }
+  .empty-state { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+
+  /* Bottom nav */
+  .app-nav {
+    display: flex; border-top: 1px solid var(--border); margin-top: 16px;
+    background: var(--dark);
+  }
+  .app-nav-btn {
+    flex: 1; padding: 12px 0 10px; border: none; background: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    color: var(--muted); font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 700;
+    transition: color .15s; letter-spacing: .3px;
+  }
+  .app-nav-btn.active { color: var(--yellow); }
+  .app-nav-btn span:first-child { font-size: 18px; }
+
+  /* Form */
+  .app-form { padding: 6px 16px 16px; overflow-y: auto; max-height: 520px; }
+  .form-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--yellow); margin: 14px 0 12px; }
+  .form-label { font-size: 11px; font-weight: 800; color: var(--muted); margin-bottom: 4px; display: block; letter-spacing: .5px; text-transform: uppercase; }
+  .form-input, .form-select {
+    width: 100%; padding: 11px 14px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--dark);
+    color: var(--text); font-family: 'Nunito', sans-serif; font-size: 14px;
+    outline: none; margin-bottom: 12px; transition: border-color .15s;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--coral); }
+  .form-select { appearance: none; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .theme-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .theme-btn {
+    width: 42px; height: 42px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--dark); font-size: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .12s;
+  }
+  .theme-btn.active { border-color: var(--coral); background: #ff5c5c18; }
+  .save-btn {
+    width: 100%; padding: 13px; background: var(--coral); border: none; border-radius: 14px;
+    color: #fff; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900;
+    cursor: pointer; margin-top: 4px; transition: opacity .15s;
+  }
+  .save-btn:hover { opacity: .88; }
+  .cancel-btn {
+    width: 100%; padding: 11px; background: var(--border); border: none; border-radius: 14px;
+    color: var(--muted); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 8px;
+  }
+
+  /* Detail */
+  .detail-wrap { padding: 14px 16px 16px; }
+  .back-btn {
+    background: var(--border); border: none; border-radius: 10px; padding: 7px 16px;
+    color: var(--muted); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; margin-bottom: 14px;
+  }
+  .detail-card { background: var(--dark); border-radius: 20px; padding: 20px; border: 1px solid var(--border); }
+  .detail-theme { font-size: 52px; text-align: center; margin-bottom: 6px; }
+  .detail-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; text-align: center; margin-bottom: 14px; }
+  .detail-status { text-align: center; margin-bottom: 16px; }
+  .detail-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+  .detail-icon { font-size: 16px; min-width: 22px; }
+  .detail-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+  .edit-btn {
+    flex: 1; padding: 11px; background: var(--coral); border: none; border-radius: 12px;
+    color: #fff; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer;
+  }
+  .del-btn {
+    flex: 1; padding: 11px; background: #ff5c5c18; border: 1px solid var(--coral);
+    border-radius: 12px; color: var(--coral); font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 800; cursor: pointer;
+  }
+
+  /* Stats view */
+  .stats-view { padding: 14px 16px 20px; overflow-y: auto; max-height: 520px; }
+  .stats-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--yellow); margin-bottom: 14px; }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stats-card { background: var(--dark); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; }
+  .stats-card-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--yellow); }
+  .stats-card-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .status-list { background: var(--dark); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .status-list-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .status-row-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .status-label-text { flex: 1; font-size: 13px; }
+  .status-count { font-weight: 800; font-size: 14px; }
+  .notif-card { background: var(--dark); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+  .notif-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .days-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .day-pill {
+    padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-family: 'Nunito', sans-serif;
+    font-size: 12px; font-weight: 800; cursor: pointer; transition: all .15s;
+  }
+  .day-pill.active { background: var(--yellow); color: var(--dark); border-color: var(--yellow); }
+  .notif-btn {
+    width: 100%; padding: 11px; background: var(--mint); border: none; border-radius: 12px;
+    color: var(--dark); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900; cursor: pointer;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: var(--dark);
+    padding: 10px 22px; border-radius: 20px; font-size: 13px; font-weight: 800;
+    z-index: 999; box-shadow: 0 4px 20px #0006; display: none; white-space: nowrap;
+  }
+
+  /* Filter row */
+  .filter-row { display: flex; gap: 8px; padding: 12px 16px 0; overflow-x: auto; }
+  .filter-btn {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-family: 'Nunito', sans-serif;
+    font-size: 11px; font-weight: 800; cursor: pointer; transition: all .15s; white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .filter-btn.active { background: var(--coral); color: #fff; border-color: var(--coral); }
+
+  /* List */
+  .list-section { padding: 12px 16px 0; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border); padding: 32px 24px;
+    text-align: center; color: var(--muted); font-size: 12px;
+  }
+  footer .logo { font-size: 22px; display: block; margin-bottom: 8px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes floatAnim {
+    0% { transform: translateY(0) rotate(0deg); opacity: .13; }
+    50% { opacity: .07; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="site-header">
+  <a class="logo" href="#hero">mini<span>event</span></a>
+  <nav class="header-nav">
+    <a class="nav-pill" href="#hero">Главная</a>
+    <a class="nav-pill active" href="#app">Календарь</a>
+  </nav>
+</header>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-floats" id="heroFloats"></div>
+  <div class="hero-tag">🎪 Для детских аниматоров</div>
+  <h1 class="hero-title">
+    <span class="line1">MINI</span>
+    <span class="line2">EVENT</span>
+  </h1>
+  <p class="hero-subtitle">Все твои мероприятия в одном месте. Быстро, удобно, всегда под рукой.</p>
+  <button class="hero-cta" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">
+    Открыть календарь →
+  </button>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip" id="statsStrip">
+  <div class="stat-item"><div class="stat-num" id="sTotal">0</div><div class="stat-label">Всего событий</div></div>
+  <div class="stat-item"><div class="stat-num" id="sConfirmed">0</div><div class="stat-label">Подтверждено</div></div>
+  <div class="stat-item"><div class="stat-num" id="sWeek">0</div><div class="stat-label">На этой неделе</div></div>
+  <div class="stat-item"><div class="stat-num" id="sIncome">0 ₽</div><div class="stat-label">Заработано</div></div>
+</div>
+
+<!-- APP SECTION -->
+<section id="app">
+  <div class="section-header">
+    <div class="section-tag">📅 Рабочий инструмент</div>
+    <h2 class="section-title">МОИ МЕРОПРИЯТИЯ</h2>
+  </div>
+  <div class="app-shell">
+    <div class="app-topbar">
+      <div class="app-topbar-title">🎪 МОИ МЕРОПРИЯТИЯ</div>
+      <div class="app-topbar-sub" id="appSub">Загрузка...</div>
+    </div>
+
+    <!-- Content area -->
+    <div id="appContent"></div>
+
+    <!-- Bottom nav -->
+    <nav class="app-nav">
+      <button class="app-nav-btn active" id="navCalendar" onclick="switchView('calendar')"><span>📅</span>Календарь</button>
+      <button class="app-nav-btn" id="navList" onclick="switchView('list')"><span>📋</span>Список</button>
+      <button class="app-nav-btn" id="navAdd" onclick="openAdd()"><span>➕</span>Добавить</button>
+      <button class="app-nav-btn" id="navStats" onclick="switchView('stats')"><span>📊</span>Итоги</button>
+    </nav>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="logo">mini<span style="color:var(--coral)">event</span></span>
+  <p>Твой личный планировщик мероприятий ✨</p>
+</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const THEMES = ["🎪","🎠","🎭","🎨","🎉","🦄","🌈","🎈"];
+const STATUS = {
+  confirmed: { label:"Подтверждено", color:"var(--confirmed)", bg:"#3dd9a418" },
+  pending:   { label:"Ожидание",     color:"var(--pending)",   bg:"#ffd84d18" },
+  completed: { label:"Проведено",    color:"var(--completed)", bg:"#a78bfa18" },
+  cancelled: { label:"Отменено",     color:"var(--cancelled)", bg:"#ff5c5c18" },
+};
+const AGE_GROUPS = ["1–3 года","3–5 лет","5–7 лет","7–10 лет","10+ лет","Смешанный"];
+const MONTHS = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+const DAYS   = ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"];
+
+function genId() { return Math.random().toString(36).slice(2,10); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function fmtMoney(v) { return Number(v||0).toLocaleString("ru"); }
+
+const DEMO = [
+  { id:genId(), title:"День рождения Маши", date:todayStr(), time:"12:00", location:"ТЦ Радуга, зал 2", theme:"🦄", ageGroup:"3–5 лет", status:"confirmed", payment:"3500", notes:"Unicorn тема, 15 детей" },
+  { id:genId(), title:"Корпоратив — детская зона", date:new Date(Date.now()+2*864e5).toISOString().slice(0,10), time:"15:00", location:"Офис, набережная", theme:"🎨", ageGroup:"5–7 лет", status:"pending", payment:"6000", notes:"Рисование, 20 детей" },
+  { id:genId(), title:"Утренник в садике", date:new Date(Date.now()+5*864e5).toISOString().slice(0,10), time:"10:00", location:"Детсад №14", theme:"🎭", ageGroup:"3–5 лет", status:"confirmed", payment:"2500", notes:"" },
+];
+
+let events = (() => { try { const s=localStorage.getItem("minievent_v1"); return s?JSON.parse(s):DEMO; } catch { return DEMO; } })();
+let view = "calendar";
+let curY = new Date().getFullYear(), curM = new Date().getMonth();
+let editId = null, detailId = null, filterStatus = "all", notifDays = 1;
+let formData = emptyForm();
+
+function emptyForm() { return { title:"", date:"", time:"", location:"", theme:"🎉", ageGroup:"5–7 лет", status:"confirmed", payment:"", notes:"" }; }
+function save() { try { localStorage.setItem("minievent_v1", JSON.stringify(events)); } catch {} }
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.style.display = "block";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.style.display = "none", 2800);
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  const now = new Date(), in7 = new Date(Date.now()+7*864e5);
+  const week = events.filter(e => { const d=new Date(e.date); return d>=now&&d<=in7&&e.status!=="cancelled"; });
+  const income = events.filter(e=>e.status==="completed").reduce((s,e)=>s+Number(e.payment||0),0);
+  document.getElementById("sTotal").textContent = events.length;
+  document.getElementById("sConfirmed").textContent = events.filter(e=>e.status==="confirmed").length;
+  document.getElementById("sWeek").textContent = week.length;
+  document.getElementById("sIncome").textContent = fmtMoney(income)+" ₽";
+  document.getElementById("appSub").textContent = `Календарь · ${events.length} событий`;
+}
+
+// ── UPCOMING ──────────────────────────────────────────────────────────────────
+function upcomingEvents() {
+  const now = new Date(), in7 = new Date(Date.now()+7*864e5);
+  return events.filter(e => { const d=new Date(e.date); return d>=now&&d<=in7&&e.status!=="cancelled"; })
+               .sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render() {
+  updateStats();
+  const content = document.getElementById("appContent");
+  if (view==="calendar") content.innerHTML = renderCalendar();
+  else if (view==="list") content.innerHTML = renderList();
+  else if (view==="add")  content.innerHTML = renderForm();
+  else if (view==="detail") content.innerHTML = renderDetail();
+  else if (view==="stats") content.innerHTML = renderStats();
+  bindEvents();
+  // nav active
+  ["Calendar","List","Add","Stats"].forEach(v => {
+    const btn = document.getElementById("nav"+v);
+    if (btn) btn.classList.toggle("active", view===v.toLowerCase()||(v==="Add"&&view==="add"));
+  });
+}
+
+// ── CALENDAR ──────────────────────────────────────────────────────────────────
+function renderCalendar() {
+  const first = new Date(curY, curM, 1).getDay();
+  const total = new Date(curY, curM+1, 0).getDate();
+  const upcoming = upcomingEvents();
+
+  let cells = "";
+  for (let i=0;i<first;i++) cells += `<div class="day-cell empty"></div>`;
+  for (let d=1;d<=total;d++) {
+    const ds = `${curY}-${String(curM+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const evs = events.filter(e=>e.date===ds);
+    const isToday = ds===todayStr();
+    const dots = evs.slice(0,3).map(e=>`<div class="dot" style="background:${STATUS[e.status]?.color||"#aaa"}"></div>`).join("");
+    const cls = ["day-cell", isToday?"today":"", evs.length?"has-ev":""].filter(Boolean).join(" ");
+    const firstEv = evs[0]?.id||"";
+    cells += `<div class="${cls}" ${firstEv?`onclick="openDetail('${firstEv}')"`:""}>${d}${evs.length?`<div class="dot-row">${dots}</div>`:""}</div>`;
+  }
+
+  const upHtml = upcoming.length
+    ? upcoming.map(e=>eventCardHtml(e)).join("")
+    : `<div class="empty-state">Мероприятий нет 🎈</div>`;
+
+  return `
+    <div class="stats-row">
+      <div class="mini-stat"><div class="mini-stat-num">${upcomingEvents().length}</div><div class="mini-stat-label">На неделе</div></div>
+      <div class="mini-stat"><div class="mini-stat-num">${events.filter(e=>e.status==="confirmed").length}</div><div class="mini-stat-label">Подтверждено</div></div>
+      <div class="mini-stat"><div class="mini-stat-num">${fmtMoney(events.filter(e=>e.status==="completed").reduce((s,e)=>s+Number(e.payment||0),0))}₽</div><div class="mini-stat-label">Заработано</div></div>
+    </div>
+    <div class="month-nav">
+      <button class="arrow-btn" onclick="prevMonth()">‹</button>
+      <span class="month-title">${MONTHS[curM]} ${curY}</span>
+      <button class="arrow-btn" onclick="nextMonth()">›</button>
+    </div>
+    <div class="cal-grid">
+      ${DAYS.map(d=>`<div class="day-head">${d}</div>`).join("")}
+      ${cells}
+    </div>
+    <div class="upcoming-section">
+      <div class="upcoming-title">⚡ Ближайшие 7 дней</div>
+      ${upHtml}
+    </div>
+    <div style="padding:12px 16px 4px;">
+      <button class="notif-btn" onclick="requestNotif()" style="width:100%;padding:11px;background:var(--mint);border:none;border-radius:12px;color:var(--dark);font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;">🔔 Включить напоминания</button>
+    </div>`;
+}
+
+function prevMonth() { const d=new Date(curY,curM-1); curY=d.getFullYear(); curM=d.getMonth(); render(); }
+function nextMonth() { const d=new Date(curY,curM+1); curY=d.getFullYear(); curM=d.getMonth(); render(); }
+
+// ── EVENT CARD HTML ───────────────────────────────────────────────────────────
+function eventCardHtml(ev) {
+  const st = STATUS[ev.status]||STATUS.pending;
+  return `<div class="event-card" style="border-left-color:${st.color}" onclick="openDetail('${ev.id}')">
+    <div class="ec-top">
+      <div>
+        <div class="ec-title">${ev.title}</div>
+        <div class="ec-meta">
+          📅 ${ev.date}${ev.time?" · ⏰ "+ev.time:""}<br>
+          ${ev.location?"📍 "+ev.location+"<br>":""}
+          ${ev.ageGroup?"👦 "+ev.ageGroup:""}
+        </div>
+      </div>
+      <div class="ec-right">
+        <div class="ec-theme">${ev.theme}</div>
+        <span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span>
+        ${ev.payment?`<span class="pay-badge">${fmtMoney(ev.payment)} ₽</span>`:""}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── LIST ──────────────────────────────────────────────────────────────────────
+function renderList() {
+  const filtered = filterStatus==="all" ? events : events.filter(e=>e.status===filterStatus);
+  const sorted = [...filtered].sort((a,b)=>a.date.localeCompare(b.date));
+  const filterBtns = ["all",...Object.keys(STATUS)].map(s=>`
+    <button class="filter-btn ${filterStatus===s?"active":""}" onclick="setFilter('${s}')">${s==="all"?"Все":STATUS[s].label}</button>`).join("");
+  const list = sorted.length
+    ? sorted.map(e=>eventCardHtml(e)).join("")
+    : `<div class="empty-state" style="padding:30px">Ничего нет 🎈</div>`;
+  return `<div class="filter-row">${filterBtns}</div><div class="list-section">${list}</div>`;
+}
+
+function setFilter(s) { filterStatus=s; render(); }
+
+// ── FORM ──────────────────────────────────────────────────────────────────────
+function renderForm() {
+  const themesBtns = THEMES.map(t=>`<button class="theme-btn ${formData.theme===t?"active":""}" onclick="setTheme('${t}')">${t}</button>`).join("");
+  const ageOpts = AGE_GROUPS.map(a=>`<option value="${a}" ${formData.ageGroup===a?"selected":""}>${a}</option>`).join("");
+  const stOpts = Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${formData.status===k?"selected":""}>${v.label}</option>`).join("");
+  return `<div class="app-form">
+    <div class="form-title">${editId?"✏️ РЕДАКТИРОВАТЬ":"🎪 НОВОЕ МЕРОПРИЯТИЕ"}</div>
+    <label class="form-label">Название *</label>
+    <input class="form-input" id="f_title" placeholder="День рождения, утренник…" value="${esc(formData.title)}">
+    <div class="grid-2">
+      <div><label class="form-label">Дата *</label><input type="date" class="form-input" id="f_date" value="${formData.date}"></div>
+      <div><label class="form-label">Время</label><input type="time" class="form-input" id="f_time" value="${formData.time}"></div>
+    </div>
+    <label class="form-label">Место</label>
+    <input class="form-input" id="f_location" placeholder="ТЦ Радуга, детсад №5…" value="${esc(formData.location)}">
+    <label class="form-label">Тема</label>
+    <div class="theme-row">${themesBtns}</div>
+    <label class="form-label">Возраст детей</label>
+    <select class="form-select" id="f_age">${ageOpts}</select>
+    <label class="form-label">Статус</label>
+    <select class="form-select" id="f_status">${stOpts}</select>
+    <label class="form-label">Оплата (₽)</label>
+    <input type="number" class="form-input" id="f_payment" placeholder="3500" value="${formData.payment}">
+    <label class="form-label">Заметки</label>
+    <input class="form-input" id="f_notes" placeholder="Тема, кол-во детей…" value="${esc(formData.notes)}">
+    <button class="save-btn" onclick="saveEvent()">${editId?"💾 Сохранить":"🎉 Добавить"}</button>
+    <button class="cancel-btn" onclick="cancelForm()">Отмена</button>
+    <div style="height:16px"></div>
+  </div>`;
+}
+
+function setTheme(t) { formData.theme=t; render(); }
+function readForm() {
+  formData.title    = document.getElementById("f_title")?.value||"";
+  formData.date     = document.getElementById("f_date")?.value||"";
+  formData.time     = document.getElementById("f_time")?.value||"";
+  formData.location = document.getElementById("f_location")?.value||"";
+  formData.ageGroup = document.getElementById("f_age")?.value||"";
+  formData.status   = document.getElementById("f_status")?.value||"";
+  formData.payment  = document.getElementById("f_payment")?.value||"";
+  formData.notes    = document.getElementById("f_notes")?.value||"";
+}
+function saveEvent() {
+  readForm();
+  if (!formData.title||!formData.date) { toast("⚠️ Укажи название и дату!"); return; }
+  if (editId) {
+    events = events.map(e=>e.id===editId?{...formData,id:editId}:e);
+    toast("✅ Мероприятие обновлено!");
+  } else {
+    events.push({...formData, id:genId()});
+    toast("🎉 Мероприятие добавлено!");
+  }
+  save(); formData=emptyForm(); editId=null; view="calendar"; render();
+}
+function cancelForm() { formData=emptyForm(); editId=null; view="calendar"; render(); }
+function openAdd() { formData=emptyForm(); editId=null; view="add"; render(); }
+
+// ── DETAIL ────────────────────────────────────────────────────────────────────
+function renderDetail() {
+  const ev = events.find(e=>e.id===detailId);
+  if (!ev) return `<div class="detail-wrap"><button class="back-btn" onclick="switchView('list')">← Назад</button></div>`;
+  const st = STATUS[ev.status]||STATUS.pending;
+  const rows = [
+    {icon:"📅", text:`${ev.date}${ev.time?" · "+ev.time:""}`},
+    {icon:"📍", text:ev.location},
+    {icon:"👦", text:ev.ageGroup},
+    {icon:"💰", text:ev.payment?fmtMoney(ev.payment)+" ₽":"—"},
+    {icon:"📝", text:ev.notes||"—"},
+  ].filter(r=>r.text).map(r=>`<div class="detail-row"><span class="detail-icon">${r.icon}</span><span class="detail-text">${esc(r.text)}</span></div>`).join("");
+  return `<div class="detail-wrap">
+    <button class="back-btn" onclick="switchView('list')">← Назад</button>
+    <div class="detail-card">
+      <div class="detail-theme">${ev.theme}</div>
+      <div class="detail-title">${esc(ev.title)}</div>
+      <div class="detail-status"><span class="status-badge" style="background:${st.bg};color:${st.color};font-size:12px;padding:4px 14px">${st.label}</span></div>
+      ${rows}
+      <div class="btn-row">
+        <button class="edit-btn" onclick="openEdit('${ev.id}')">✏️ Изменить</button>
+        <button class="del-btn" onclick="deleteEvent('${ev.id}')">🗑️ Удалить</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openDetail(id) { detailId=id; view="detail"; render(); }
+function openEdit(id) {
+  const ev = events.find(e=>e.id===id);
+  if (!ev) return;
+  formData={...ev}; editId=id; view="add"; render();
+}
+function deleteEvent(id) {
+  events=events.filter(e=>e.id!==id); save();
+  toast("🗑️ Удалено"); view="list"; render();
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function renderStats() {
+  const now = new Date(), thisM = events.filter(e=>{const d=new Date(e.date);return d.getFullYear()===curY&&d.getMonth()===curM;});
+  const income = events.filter(e=>e.status==="completed").reduce((s,e)=>s+Number(e.payment||0),0);
+  const statusRows = Object.entries(STATUS).map(([k,v])=>`
+    <div class="status-row-item">
+      <div class="status-dot" style="background:${v.color}"></div>
+      <span class="status-label-text">${v.label}</span>
+      <span class="status-count" style="color:${v.color}">${events.filter(e=>e.status===k).length}</span>
+    </div>`).join("");
+  const dayPills = [1,2,3].map(n=>`<button class="day-pill ${notifDays===n?"active":""}" onclick="setNotifDays(${n})">${n} д</button>`).join("");
+  return `<div class="stats-view">
+    <div class="stats-title">📊 СТАТИСТИКА</div>
+    <div class="stats-grid">
+      <div class="stats-card"><div class="stats-card-num">${events.length}</div><div class="stats-card-label">Всего событий</div></div>
+      <div class="stats-card"><div class="stats-card-num">${thisM.length}</div><div class="stats-card-label">В этом месяце</div></div>
+      <div class="stats-card"><div class="stats-card-num">${fmtMoney(income)} ₽</div><div class="stats-card-label">Заработано</div></div>
+      <div class="stats-card"><div class="stats-card-num">${upcomingEvents().length}</div><div class="stats-card-label">На этой неделе</div></div>
+    </div>
+    <div class="status-list">
+      <div class="status-list-title">По статусам</div>
+      ${statusRows}
+    </div>
+    <div class="notif-card">
+      <div class="notif-title">🔔 Напоминания</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Уведомлять за:</div>
+      <div class="days-row">${dayPills}</div>
+      <button class="notif-btn" onclick="requestNotif()">🔔 Разрешить уведомления</button>
+    </div>
+    <div style="height:16px"></div>
+  </div>`;
+}
+
+function setNotifDays(n) { notifDays=n; render(); }
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
+function requestNotif() {
+  if (!("Notification" in window)) { toast("❌ Уведомления не поддерживаются"); return; }
+  Notification.requestPermission().then(p => {
+    if (p==="granted") { toast("🔔 Уведомления включены!"); checkNotifications(); }
+    else toast("🔕 Уведомления отклонены");
+  });
+}
+function checkNotifications() {
+  if (Notification.permission!=="granted") return;
+  const now = new Date();
+  events.forEach(ev => {
+    const evDate = new Date(ev.date+"T"+(ev.time||"00:00"));
+    const diff = (evDate-now)/864e5;
+    if (diff>0&&diff<=notifDays) {
+      const key="notif_"+ev.id+"_"+notifDays;
+      if (!sessionStorage.getItem(key)) {
+        new Notification("🎪 Скоро мероприятие!", { body:`${ev.title} — ${ev.date} в ${ev.time||"..."}\n📍 ${ev.location}` });
+        sessionStorage.setItem(key,"1");
+      }
+    }
+  });
+}
+
+// ── VIEW SWITCH ───────────────────────────────────────────────────────────────
+function switchView(v) { view=v; render(); }
+function bindEvents() {} // hooks if needed
+
+// ── ESCAPE HTML ───────────────────────────────────────────────────────────────
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+// ── HERO FLOATS ───────────────────────────────────────────────────────────────
+function spawnFloats() {
+  const container = document.getElementById("heroFloats");
+  const emojis = ["🎈","🎉","🎪","⭐","🌟","🎠","🦄","🎭"];
+  for (let i=0;i<12;i++) {
+    const el = document.createElement("div");
+    el.className = "float";
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left = Math.random()*100+"%";
+    el.style.top = Math.random()*100+"%";
+    el.style.fontSize = (24+Math.random()*28)+"px";
+    el.style.animationDuration = (8+Math.random()*12)+"s";
+    el.style.animationDelay = (-Math.random()*12)+"s";
+    container.appendChild(el);
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+spawnFloats();
+render();
+if (Notification.permission==="granted") checkNotifications();
+</script>
+</body>
+</html>
